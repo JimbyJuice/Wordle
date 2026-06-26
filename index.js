@@ -1,3 +1,6 @@
+import { ANSWERS } from "./answers.js";
+import { VALID_WORDS } from "./guesses.js";
+
 const height = 6; // number of guesses
 const width = 5; // length of the word
 
@@ -5,7 +8,8 @@ let row = 0;
 let col = 0;
 
 let gameOver = false;
-let word = "BANAL";
+
+const word = ANSWERS[Math.floor(Math.random() * ANSWERS.length)].toUpperCase();
 
 function initialize() {
   for (let r = 0; r < height; r++) {
@@ -41,14 +45,29 @@ function initialize() {
       );
       currTile.innerText = "";
     } else if (e.code == "Enter" && col == width) {
+      // get freq of answer
       let freq = new Map();
       for (let char of word) {
         freq.set(char, (freq.get(char) || 0) + 1);
       }
 
-      update(freq);
-      row += 1;
-      col = 0;
+      // get guess
+      let guess = "";
+      for (let c = 0; c < width; c++) {
+        let currTile = document.getElementById(
+          row.toString() + "-" + c.toString(),
+        );
+        guess = guess + currTile.innerText;
+      }
+      guess = guess.trim().toLowerCase();
+
+      if (VALID_WORDS.has(guess)) {
+        update(freq);
+        row += 1;
+        col = 0;
+      } else {
+        document.getElementById("answer").innerText = "Invalid Word";
+      }
     }
 
     if (!gameOver && row == height) {
